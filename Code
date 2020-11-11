@@ -1,0 +1,429 @@
+import java.util.*; 
+import java.awt.event.*; 
+import java.awt.*; 
+import javax.swing.*; 
+import java.text.DecimalFormat; 
+
+/*
+ * Mercedes Moore
+ * APCS A
+ * MandelBrot Set Project 
+ */
+
+/*
+ * This program simulates a Mandelbrot set, which is a set of complex numbers for which the function does not diverge when iterated from, remains bounded in absolute value. This phenomenon involves fractals, which are irregular fragmented shapes that exhibit intricate structure at all sizes so that the details are reminiscent of the entire object. The Mandelbrot Set is continuously tested by a point test, which claims: at any point c, in the complex plane is a member of the Mandelbrot Set if when you substitude the point into the recursive function f(z) = pow(z,2) + c (where z starts at (0+0i) the distance from f(z) to the origin (0+0i) is always less than 2. 
+ * 
+ * This program includes five classes, each of which contributes to creating the display of the mandelbrot set. Each class includes member methods and data. Many classes are used within other classes. 
+ */
+
+/*
+ * This class creates and simulates an Complex number object. The object consists of a float real number component and a float imaginary number component. This class includes access methods and modifier methods with public scope. 
+ */
+class ComplexNum 
+{
+		//Instance Variables & Private Data
+		private float realNumber; 
+		private float imaginaryNumber; 
+
+		//Constructor
+		/*
+		 * pre: The real number component and imaginary component must be float 
+		 * numbers. 
+		 * post: A complex number object is created. 
+		 */
+		public ComplexNum (float newRealNumber, float newImaginaryNumber)
+		{ 
+			realNumber = newRealNumber; 
+			imaginaryNumber = newImaginaryNumber;   
+		}
+
+		//Modifier Method
+		/*
+		 * pre: A complex number object exists; newAValue and newBValue must be 
+		 * float numbers. 
+		 * post: The realNumber and imaginaryNumber component of the object have 
+		 * been updated to the passed in parameters. 
+		 */
+		public void changeValue(float newAValue, float newBValue)
+		{
+			realNumber = newAValue;
+			imaginaryNumber = newBValue;   
+		}
+
+		//Accessor/Function Method
+		/*
+		 * pre: A complex number object exists
+		 * post: The complex number object is printed to the console window.
+		 */
+        public String toString()
+        {
+         return realNumber + " + " + imaginaryNumber +"i";
+        }
+        
+        //Accessor Method
+        /*
+         * pre: A complex number object exists
+         * post: The real float number component of the complex number is 
+         * returned.
+         */
+		public float getReal()
+		{
+			return realNumber;
+		}
+		
+		//Accessor Method
+		/*
+		 * pre: A complex number object exists
+		 * post: The imaginary float number component of the complex number is 
+		 * returned. 
+		 */
+		public float getImaginary()
+		{
+			return imaginaryNumber;   
+		}
+		
+		//Function Method
+		/*
+		 * pre: A complex number object exists
+		 * post: The complex number is printed to the console. 
+		 */
+		public void printComplex()
+		{
+			DecimalFormat decimalformat = new DecimalFormat("#.##");
+			
+			System.out.println(decimalformat.format(realNumber) + " +  " + 
+			decimalformat.format(imaginaryNumber) +"i");   
+		}
+		
+		//Function Method
+		/*
+		 * pre: A valid Complex Number object must be passed in; a complex number 
+		 * object exists
+		 * post: The sum of two complex number objects is returned. 
+		 */
+		public ComplexNum add(ComplexNum other) 
+		{	
+			return new ComplexNum(this.realNumber + other.realNumber, 
+			this.imaginaryNumber + other.imaginaryNumber);  //15/15
+		}
+		
+		//Function Method
+		/*
+		 * pre: A valid Complex Number object must be passed in; a complex number 
+		 * 	object exists
+		 * post: The product of two complex number objects is returned. 
+		 */
+		public ComplexNum mult(ComplexNum other)   
+		{
+			return new ComplexNum((this.realNumber*other.realNumber)-		
+			(this.imaginaryNumber*other.imaginaryNumber),
+			(this.imaginaryNumber*other.realNumber)+
+			(this.realNumber*other.imaginaryNumber));
+		}
+}
+
+/*
+ * This class creates and simulates a MandelBrotPlane object. This class creates and simulates an Complex number object. The object consists of a complex number center point and a float scale factor. This class includes access methods and modifier methods with public scope. 
+ */
+class MandelBrotPlane {
+	//Instance Variables & Private Data
+	private ComplexNum centerPoint; 
+	private float scaleFactor;
+	
+	//Constructor
+	/*
+	 * pre: newPoint must be a Complex Number object & newScale must be a float 
+	 * number. 
+	 * post: A MandelBrotPlane object is created
+	 */
+	public MandelBrotPlane (ComplexNum newPoint, float newScale)
+	{
+		centerPoint = newPoint;
+		scaleFactor = newScale; 
+	}
+	
+	//Accessor Method
+	/*
+	 * pre: A MandelBrotPlane object exists
+	 * post: The center point of the MandelBrot plane object is returned. 
+	 */
+	public ComplexNum getPoint()
+	{
+		return centerPoint;
+	}
+	
+	//Accessor Method
+	/*
+	 * pre: A MandelBrotPlane object exists
+	 * post: The scale factor of the MandelBrot plane object is returned. 
+	 */
+	public float getScale()
+	{
+		return scaleFactor; 
+	}
+	
+	//Mutator Method
+	/*
+	 * pre: A MandelBrotPlane object exists; newFactor must be a float number.
+	 * post: Updates the scale factor of the MandelBrotPlane object to the passed 
+	 * in float number. 
+	 */
+	public void changeScaleFactor(float newFactor)
+	{
+		scaleFactor = newFactor; 
+	}
+	
+	//Mutator Method
+	/*
+	 * pre: A MandelBrotPlane object exists; num1 must be a ComplexNum object.
+	 * post: Updates the center point of the MandelBrotPlane object to the passed 
+	 * in ComplexNum object. 
+	 */
+	public void changePoint(ComplexNum num1)
+	{
+		centerPoint = num1; 
+	}
+	
+	//Function Method
+	/*
+	 * pre: A MandelBrotPlane object exists; g must be a valid Graphics object; 
+	 * complexPoint must be a valid ComplexNum object
+	 * post: This method scales and draws one complex point from the complex 
+	 * plane to the graphics window. 
+	 */
+	public void drawPoint(Graphics g, ComplexNum complexPoint)
+	{
+		float dx =(float) (complexPoint.getReal() - centerPoint.getReal()); 
+		float dy = (float) (complexPoint.getImaginary() - 
+		centerPoint.getImaginary()); 
+		
+		dx*=scaleFactor; 
+		dy*=scaleFactor; 
+		
+		int xValue = 200 + (int)dx;
+		int yValue = 200 - (int)dy; 
+		
+		
+		g.drawRect(xValue, yValue, 1, 1);
+	}
+	
+	//Function Method
+	/*
+	 * pre: complex1 is  a valid ComplexNum object
+	 * post: This method tests one complex point in regards to the Mandelbrot 	
+	 * Point Test (any point c, in the complex plane is a member of the 
+	 * Mandelbrot Set if when you substitute the point into the recursive 
+	 * function f(z) = pow(z,2) + c (where z starts at (0+0i) the distance from 
+	 * f(z) to the origin (0+0i) is always less than 2). This method returns the 
+	 * number of successful iterations in which the point passed the Mandelbrot 
+	 * Test. 
+	 */
+	public int testPoint(ComplexNum complex1)
+	{
+		
+		ComplexNum z = new ComplexNum(0,0);
+		int iterationsSuccessful = 0; 
+		float tempNum = 0; 
+
+		while (tempNum < 2 && iterationsSuccessful < 100)
+		{
+			z = z.mult(z).add(complex1);
+			iterationsSuccessful++;
+			tempNum = (float) (Math.sqrt(z.getImaginary()*z.getImaginary() + 
+						z.getReal()*z.getReal())); 
+		} 
+		return iterationsSuccessful; 	
+	}
+	
+	
+	//Function Method
+	/*
+	 * pre: complex2 is a valid ComplexNum object
+	 * post: This method returns the corresponding color regarding to the number 
+	 * of iterations determined by testPoint(). 
+	 */
+	public Color getPointColor(ComplexNum complex2)
+	{
+		int iterationsCounter = testPoint(complex2);
+		
+		if (iterationsCounter >=100)
+		{
+			return Color.BLACK;
+		}
+		else if (iterationsCounter > 90)
+		{
+			return Color.ORANGE; 
+		}
+		else if (iterationsCounter > 80)
+		{
+			return Color.PINK;
+		}
+		else if (iterationsCounter > 70)
+		{
+			return Color.MAGENTA;
+		}
+		else if (iterationsCounter > 60)
+		{
+			return Color.BLUE;
+		}
+		else if (iterationsCounter > 50)
+		{
+			return Color.GREEN;
+		}
+		else if (iterationsCounter > 40)
+		{
+			return Color.CYAN;
+		}
+		else if (iterationsCounter > 30)
+		{
+			return Color.YELLOW;
+		}
+		else if (iterationsCounter > 20)
+		{
+			return Color.DARK_GRAY;
+		}
+		else if (iterationsCounter > 10)
+		{
+			return Color.LIGHT_GRAY;
+		}
+		else
+		{
+			return Color.WHITE;
+		}
+	}
+	
+	//Function Method
+	/*
+	 * pre:g must be a valid Graphics object
+	 * post: This method iterates over all the points in the complex Plane and 
+	 * draws them to the graphics window. 
+	 */
+	public void drawEntireGrid(Graphics g)
+	{
+  
+		for (float xPos = -2.0f; xPos <= 2.0f;xPos += (1.0f/100.0f))
+		{
+			for (float yPos = -2.0f; yPos <=2.0f; yPos+= (1.0f/100.0f))
+			{
+				ComplexNum currentPoint = new ComplexNum(xPos, yPos);
+			   int pass = testPoint(currentPoint);
+				Color currentColor = getPointColor(currentPoint); 
+				g.setColor(currentColor);
+				drawPoint(g, currentPoint);
+			}
+		}
+	}
+}
+	
+/*
+ * This class aids in creating the graphic component of the MandelbrotPlane object. 
+ */
+class MComponent extends JComponent
+{
+	//Instance Variables & Private Data
+	private MandelBrotPlane myMandelBrot;
+	private JButton zoom; //USE WHITE SPACE TO SEPARATE LOGICAL AREAS.
+	
+	//Constructor
+	/*
+	 * pre: N/A
+	 * post: Creates outline for the graphic components along with a button 
+	 * listener.
+	 */
+	public MComponent()
+	{
+		ComplexNum center = new ComplexNum(0,0); 
+		myMandelBrot = new MandelBrotPlane(center,100); 
+		setLayout(null); 
+		zoom = new JButton("Zoom Button"); 
+		zoom.setBounds(350,50,100,50);
+		add(zoom); 
+		ActionListener myListener = new ButtonListener(); 
+		zoom.addActionListener(myListener);
+	}
+	
+	//Function method
+	/*
+	 * pre: g is a valid Graphics object
+	 * post: This function draws the grid to the graphics component
+	 */
+	public void paintComponent(Graphics g)
+	{
+		myMandelBrot.drawEntireGrid(g); 
+	}
+
+/*
+ * This class creates a button object that facilitates user interaction with the MandelBrotPlane graphics object. 
+ */
+class ButtonListener implements ActionListener
+{
+	//Function Method
+	/*
+	 * pre: e is a valid ActionEvent Object
+	 * post: The MandelBrotPlane's scale is multiplied by 2 and the graphic 
+	 * object zooms in by a scale of 2x. 
+	 */
+	public void actionPerformed(ActionEvent e)
+	{
+		myMandelBrot.changeScaleFactor(myMandelBrot.getScale()*2); 
+		repaint(); 
+	}
+}
+
+/*
+ * This class creates a MouseListener that facilitates user interaction with the  MandelBrotPlane graphics object and helps the proper function of the buttonlistener class. 
+ */
+class Mouse implements MouseListener
+{
+	//Function Method
+	/*
+	 * pre: e is a valid MouseEvent object; a MandelBrotPlane object exists
+	 * post: The center of the MandelBrotObject is changed to where the user has 	
+	 * clicked. 
+	 */
+	public void mouseClicked(MouseEvent e)
+	{
+		int x = e.getX();
+		int y = e.getY();
+		float dx = x - 200;
+		float dy = y - 200;
+		dx = dx/myMandelBrot.getScale(); 
+		dy = dy/myMandelBrot.getScale();
+		ComplexNum newPoint = new ComplexNum(myMandelBrot.getPoint().getReal() + 	
+		dx, myMandelBrot.getPoint().getImaginary()-dy);
+		myMandelBrot.changePoint(newPoint);
+		repaint();
+	}
+	
+	//Interface Method
+	public void mouseEntered(MouseEvent e)
+	{}
+	//Interface Method
+	public void mousePressed(MouseEvent e)
+	{}
+	//Interface Method
+	public void mouseReleased(MouseEvent e)
+	{}
+	//Interface Method
+	public void mouseExited(MouseEvent e)
+	{}
+	}
+}
+
+/*
+ * This class is the driver class for this program.
+ */
+class MandelBrotSet 
+{
+	//Driver Program
+	public static void main(String[] args) {
+		JFrame frame = new JFrame();
+			frame.setSize(400,400);
+			frame.setTitle("Mandelbrot Lab");
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setVisible(true);
+			
+		MComponent MandelBrotComponent = new MComponent(); 
+			frame.add(MandelBrotComponent);
+	}
+}
